@@ -1,0 +1,40 @@
+host: "https://127.0.0.1:8200"
+ca: ""                # if ca is set, capath will be ignore
+capath: "./ca.crt"
+token: ""             # vault root token
+kvEngineList:
+- name: t_git
+- name: t_repo
+- name: t_cluster
+- name: t_tenant
+  kvList:
+  - path: "git/gitlab01/root" 
+    kvs: 
+      "access_token": "replace to the real token"
+  - path: "repo/harbor/root"
+    kvs: 
+      "admin_password": "replace to the real password"
+authList:
+- name: t_tenant
+  namespace: t-vault
+  serviceAccount: "vault-user"
+  kubeconfigPath: "~/.kube/config"
+roleList:
+- name: t_cluster
+  authName: t_tenant
+  namespace: t-nautes
+  serviceAccount: cluster
+  policies:
+  - test-policy-01
+  - test-policy-02
+policyList:
+- name: default-policy
+  rules: |
+    path "pki/*" {
+      capabilities = ["read", "list"]
+    }
+    
+    path "test-config/*" {
+      capabilities = ["read", "list"]
+    }
+
